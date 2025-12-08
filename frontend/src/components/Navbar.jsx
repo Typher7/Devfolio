@@ -4,6 +4,7 @@ import { logout } from "../redux/slices/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import GooeyNav from "./GooeyNav";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import api from "../api/axiosInstance";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -11,9 +12,17 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      // Call backend to clear the cookie
+      await api.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout request failed:", error);
+    } finally {
+      // Clear Redux state regardless of backend response
+      dispatch(logout());
+      navigate("/");
+    }
   };
 
   return (

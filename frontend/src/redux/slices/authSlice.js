@@ -7,6 +7,7 @@ const initialState = {
   error: null,
   // Do not assume authenticated on load; hydrate session via /auth/me
   isAuthenticated: false,
+  authChecked: false, // Track if initial auth check is complete
 };
 
 const authSlice = createSlice({
@@ -28,6 +29,10 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.authChecked = false; // Reset so next hydration happens fresh
+    },
+    setAuthChecked: (state, action) => {
+      state.authChecked = !!action.payload;
     },
     setLoading: (state, action) => {
       state.isLoading = action.payload;
@@ -45,5 +50,6 @@ export const {
   logout,
   setLoading,
   setError,
+  setAuthChecked,
 } = authSlice.actions;
 export default authSlice.reducer;

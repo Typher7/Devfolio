@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -24,18 +24,23 @@ import PublicPortfolio from "./pages/PublicPortfolio";
 import "./styles/index.css";
 import { useDispatch, useSelector } from "react-redux";
 import api from "./api/axiosInstance";
-import { setUser, setAuthenticated } from "./redux/slices/authSlice";
+import {
+  setUser,
+  setAuthenticated,
+  setAuthChecked,
+} from "./redux/slices/authSlice";
 
 function App() {
   const dispatch = useDispatch();
-  const { user, isAuthenticated } = useSelector((s) => s.auth);
-  const [authChecked, setAuthChecked] = useState(false);
+  const { user, isAuthenticated, authChecked } = useSelector((s) => s.auth);
 
   // Hydrate session on app load (cookie-based session)
   useEffect(() => {
     const hydrate = async () => {
       try {
-        const res = await api.get("/auth/me");
+        console.debug("[App] Starting auth hydration...");
+        const res = await api.get("/auth/me", { timeout: 10000 });
+        console.debug("[App] Auth response:", res?.data);
         if (res?.data) {
           dispatch(setUser(res.data));
           dispatch(setAuthenticated(true));
@@ -43,13 +48,21 @@ function App() {
           dispatch(setAuthenticated(false));
         }
       } catch (err) {
+        console.debug("[App] Auth hydration error:", err?.message);
         dispatch(setAuthenticated(false));
       } finally {
-        setAuthChecked(true);
+        console.debug("[App] Auth check complete, setting authChecked=true");
+        dispatch(setAuthChecked(true));
       }
     };
 
-    hydrate();
+    // Set a fallback timeout in case hydration takes too long
+    const timeoutId = setTimeout(() => {
+      console.warn("[App] Auth hydration timeout, proceeding without session");
+      dispatch(setAuthChecked(true));
+    }, 12000);
+
+    hydrate().finally(() => clearTimeout(timeoutId));
   }, [dispatch]);
 
   return (

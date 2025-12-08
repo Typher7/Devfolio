@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import api from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setUser, setAuthenticated, setAuthChecked } from "../redux/slices/authSlice";
+import {
+  setUser,
+  setAuthenticated,
+  setAuthChecked,
+} from "../redux/slices/authSlice";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({

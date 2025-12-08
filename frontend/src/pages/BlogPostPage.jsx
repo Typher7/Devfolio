@@ -4,11 +4,14 @@ import { useSelector } from "react-redux";
 import api from "../api/axiosInstance";
 
 export default function BlogPostPage() {
-  const { id } = useParams();
+  const { id, handle } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated } = useSelector((s) => s.auth);
+
+  // Determine if we're on public portfolio side
+  const isPublic = !!handle;
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -34,10 +37,10 @@ export default function BlogPostPage() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         <p className="text-gray-600">Post not found or is not published.</p>
         <button
-          onClick={() => navigate("/blog")}
+          onClick={() => navigate(isPublic ? `/portfolio/${handle}` : "/blog")}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          Back to Blog
+          {isPublic ? "Back to Portfolio" : "Back to Blog"}
         </button>
       </div>
     );
@@ -46,10 +49,10 @@ export default function BlogPostPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
       <button
-        onClick={() => navigate("/blog")}
+        onClick={() => navigate(isPublic ? `/portfolio/${handle}` : "/blog")}
         className="mb-6 text-blue-600 hover:underline"
       >
-        ← Back to Blog
+        ← Back to {isPublic ? "Portfolio" : "Blog"}
       </button>
 
       {post.image_url && (

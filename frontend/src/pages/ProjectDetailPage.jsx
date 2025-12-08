@@ -4,11 +4,14 @@ import { useSelector } from "react-redux";
 import api from "../api/axiosInstance";
 
 export default function ProjectDetailPage() {
-  const { id } = useParams();
+  const { id, handle } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated } = useSelector((s) => s.auth);
+
+  // Determine if we're on public portfolio side
+  const isPublic = !!handle;
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -34,10 +37,12 @@ export default function ProjectDetailPage() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         <p className="text-gray-600">Project not found or is not published.</p>
         <button
-          onClick={() => navigate("/projects")}
+          onClick={() =>
+            navigate(isPublic ? `/portfolio/${handle}` : "/projects")
+          }
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          Back to Projects
+          {isPublic ? "Back to Portfolio" : "Back to Projects"}
         </button>
       </div>
     );
@@ -51,10 +56,12 @@ export default function ProjectDetailPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
       <button
-        onClick={() => navigate("/projects")}
+        onClick={() =>
+          navigate(isPublic ? `/portfolio/${handle}` : "/projects")
+        }
         className="mb-6 text-blue-600 hover:underline"
       >
-        ← Back to Projects
+        ← Back to {isPublic ? "Portfolio" : "Projects"}
       </button>
 
       {project.image_url && (

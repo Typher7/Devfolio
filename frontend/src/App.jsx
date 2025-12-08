@@ -78,6 +78,24 @@ function App() {
           }
         />
 
+        {/* Public Portfolio Detail Routes */}
+        <Route
+          path="/portfolio/:handle/projects/:id"
+          element={
+            <PublicLayout>
+              <ProjectDetailPage />
+            </PublicLayout>
+          }
+        />
+        <Route
+          path="/portfolio/:handle/blog/:id"
+          element={
+            <PublicLayout>
+              <BlogPostPage />
+            </PublicLayout>
+          }
+        />
+
         {/* All other routes use the standard Navbar */}
         <Route
           path="/"

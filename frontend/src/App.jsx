@@ -6,10 +6,13 @@ import {
   Navigate,
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import PublicLayout from "./components/PublicLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import ProjectsPage from "./pages/ProjectsPage";
+import ProjectDetailPage from "./pages/ProjectDetailPage";
 import BlogPage from "./pages/BlogPage";
+import BlogPostPage from "./pages/BlogPostPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -51,71 +54,138 @@ function App() {
 
   return (
     <Router>
-      <Navbar />
       <Routes>
-        {/* Public Routes */}
+        {/* Public Portfolio Route - Separate Layout (No Navbar/Dashboard Access) */}
+        <Route
+          path="/portfolio/:handle"
+          element={
+            <PublicLayout>
+              <PublicPortfolio />
+            </PublicLayout>
+          }
+        />
+
+        {/* All other routes use the standard Navbar */}
         <Route
           path="/"
           element={
-            // Wait until we've checked session to avoid flicker
-            !authChecked ? (
+            <>
+              <Navbar />
               <HomePage />
-            ) : isAuthenticated && user?.handle ? (
-              <Navigate to={`/${user.handle}`} replace />
-            ) : (
-              <HomePage />
-            )
+            </>
           }
         />
-        <Route path="/projects" element={<ProjectsPage />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/projects"
+          element={
+            <>
+              <Navbar />
+              <ProjectsPage />
+            </>
+          }
+        />
+        <Route
+          path="/projects/:id"
+          element={
+            <>
+              <Navbar />
+              <ProjectDetailPage />
+            </>
+          }
+        />
+        <Route
+          path="/blog"
+          element={
+            <>
+              <Navbar />
+              <BlogPage />
+            </>
+          }
+        />
+        <Route
+          path="/blog/:id"
+          element={
+            <>
+              <Navbar />
+              <BlogPostPage />
+            </>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <>
+              <Navbar />
+              <LoginPage />
+            </>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <>
+              <Navbar />
+              <RegisterPage />
+            </>
+          }
+        />
 
         {/* Protected Dashboard Routes */}
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
+            <>
+              <Navbar />
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            </>
           }
         />
         <Route
           path="/dashboard/projects"
           element={
-            <ProtectedRoute>
-              <ManageProjects />
-            </ProtectedRoute>
+            <>
+              <Navbar />
+              <ProtectedRoute>
+                <ManageProjects />
+              </ProtectedRoute>
+            </>
           }
         />
         <Route
           path="/dashboard/posts"
           element={
-            <ProtectedRoute>
-              <ManagePosts />
-            </ProtectedRoute>
+            <>
+              <Navbar />
+              <ProtectedRoute>
+                <ManagePosts />
+              </ProtectedRoute>
+            </>
           }
         />
         <Route
           path="/dashboard/awards"
           element={
-            <ProtectedRoute>
-              <ManageAwards />
-            </ProtectedRoute>
+            <>
+              <Navbar />
+              <ProtectedRoute>
+                <ManageAwards />
+              </ProtectedRoute>
+            </>
           }
         />
         <Route
           path="/dashboard/profile"
           element={
-            <ProtectedRoute>
-              <EditProfile />
-            </ProtectedRoute>
+            <>
+              <Navbar />
+              <ProtectedRoute>
+                <EditProfile />
+              </ProtectedRoute>
+            </>
           }
         />
-
-        {/* Public Portfolio (Vanity URL) */}
-        <Route path="/:handle" element={<PublicPortfolio />} />
       </Routes>
     </Router>
   );

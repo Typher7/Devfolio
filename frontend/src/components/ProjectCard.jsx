@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function ProjectCard({ project }) {
   return (
@@ -10,7 +11,9 @@ export default function ProjectCard({ project }) {
           className="w-full h-48 object-cover rounded-md mb-4 shadow-sm"
         />
       )}
-      <h3 className="text-xl font-semibold mb-2 group-hover:text-indigo-700 transition-colors">{project.title}</h3>
+      <h3 className="text-xl font-semibold mb-2 group-hover:text-indigo-700 transition-colors">
+        {project.title}
+      </h3>
       <p className="text-gray-600 mb-4">{project.description}</p>
 
       {project.tags && (
@@ -27,6 +30,12 @@ export default function ProjectCard({ project }) {
       )}
 
       <div className="flex gap-2">
+        <Link
+          to={`/projects/${project.id}`}
+          className="text-indigo-700 hover:underline font-medium"
+        >
+          View Details
+        </Link>
         {project.repo_url && (
           <a
             href={project.repo_url}

@@ -57,29 +57,12 @@ export default function DashboardPage() {
     return <Navigate to="/login" />;
   }
 
-  const handleLogout = async () => {
-    try {
-      await api.post("/auth/logout");
-      dispatch(logout());
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
-  };
-
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold">Welcome, {user?.full_name}!</h1>
-            <p className="text-gray-600">Manage your portfolio content</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700"
-          >
-            Logout
-          </button>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold">Welcome, {user?.full_name}!</h1>
+          <p className="text-gray-600">Manage your portfolio content</p>
         </div>
 
         {/* Navigation Menu */}
@@ -143,7 +126,7 @@ export default function DashboardPage() {
           <div className="flex gap-4">
             {user?.handle ? (
               <a
-                href={`/${user.handle}`}
+                href={`/portfolio/${user.handle}`}
                 target="_blank"
                 rel="noreferrer"
                 className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"

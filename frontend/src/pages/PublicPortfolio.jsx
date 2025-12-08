@@ -37,16 +37,16 @@ export default function PublicPortfolio() {
   return (
     <div>
       {/* Hero Section with Background Image */}
-      <div className="relative bg-gray-900 text-white py-20 overflow-hidden">
+      <div className="relative bg-gray-900 text-white py-30 overflow-hidden">
         {/* Background Image with Overlay */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop')",
+              "url('https://images.unsplash.com/photo-1744627549992-cd7a5f157344?q=80&w=1181&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-indigo-900/80" />
+        <div className="absolute inset-0 bg-linear-to-r from-blue-900/80 to-indigo-900/80" />
 
         {/* Content */}
         <div className="relative max-w-6xl mx-auto px-4 flex items-center gap-8">

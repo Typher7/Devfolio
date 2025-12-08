@@ -8,12 +8,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// Do not automatically attach an Authorization header from localStorage.
+// We rely on cookie-based sessions (`withCredentials: true`) for authentication.
 
 export default api;

@@ -21,7 +21,7 @@ export default function ManageAwards() {
 
   const fetchAwards = async () => {
     try {
-      const response = await api.get("/awards");
+      const response = await api.get("/awards/mine");
       dispatch(setAwards(response.data));
     } catch (error) {
       console.error("Failed to fetch awards", error);

@@ -1,8 +1,12 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Navigate, Link } from "react-router-dom";
+import { useEffect } from "react";
 import api from "../api/axiosInstance";
-import { logout } from "../redux/slices/authSlice";
+import { logout, setUser } from "../redux/slices/authSlice";
+import { setProjects } from "../redux/slices/projectsSlice";
+import { setPosts } from "../redux/slices/postsSlice";
+import { setAwards } from "../redux/slices/awardsSlice";
 
 export default function DashboardPage() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -10,6 +14,44 @@ export default function DashboardPage() {
   const posts = useSelector((state) => state.posts.posts);
   const awards = useSelector((state) => state.awards.awards);
   const dispatch = useDispatch();
+
+  // Hydrate user from server (cookie-based session) when dashboard mounts
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const res = await api.get("/auth/me");
+        if (res?.data) {
+          dispatch(setUser(res.data));
+        }
+      } catch (err) {
+        // Not critical here — user will be redirected if unauthenticated
+        console.debug(
+          "Could not hydrate user on dashboard:",
+          err?.message || err
+        );
+      }
+    };
+
+    const fetchAll = async () => {
+      await fetchMe();
+
+      try {
+        const [pRes, postRes, aRes] = await Promise.all([
+          api.get("/projects/mine"),
+          api.get("/posts/mine"),
+          api.get("/awards/mine"),
+        ]);
+
+        if (pRes?.data) dispatch(setProjects(pRes.data));
+        if (postRes?.data) dispatch(setPosts(postRes.data));
+        if (aRes?.data) dispatch(setAwards(aRes.data));
+      } catch (err) {
+        console.debug("Could not fetch dashboard items:", err?.message || err);
+      }
+    };
+
+    fetchAll();
+  }, [dispatch]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -99,14 +141,24 @@ export default function DashboardPage() {
             Your public portfolio is available at:
           </p>
           <div className="flex gap-4">
-            <a
-              href={`/${user?.handle}`}
-              target="_blank"
-              rel="noreferrer"
-              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-            >
-              Visit Public Portfolio
-            </a>
+            {user?.handle ? (
+              <a
+                href={`/${user.handle}`}
+                target="_blank"
+                rel="noreferrer"
+                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+              >
+                Visit Public Portfolio
+              </a>
+            ) : (
+              <button
+                disabled
+                className="bg-gray-400 text-white px-6 py-2 rounded cursor-not-allowed"
+                title="Please set a handle in your profile to view your public portfolio"
+              >
+                Visit Public Portfolio
+              </button>
+            )}
           </div>
         </div>
       </div>

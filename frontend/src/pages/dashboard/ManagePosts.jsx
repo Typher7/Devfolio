@@ -22,7 +22,7 @@ export default function ManagePosts() {
 
   const fetchPosts = async () => {
     try {
-      const response = await api.get("/posts");
+      const response = await api.get("/posts/mine");
       dispatch(setPosts(response.data));
     } catch (error) {
       console.error("Failed to fetch posts", error);

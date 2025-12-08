@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import ProjectCard from "../components/ProjectCard";
 import api from "../api/axiosInstance";
 
@@ -6,10 +7,16 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { isAuthenticated, user } = useSelector((s) => s.auth);
+
   useEffect(() => {
     const fetchProjects = async () => {
+      setIsLoading(true);
       try {
-        const response = await api.get("/projects");
+        const endpoint = isAuthenticated ? "/projects/mine" : "/projects";
+        console.debug("Fetching projects from", endpoint, "user:", user?.id);
+        const response = await api.get(endpoint);
+        console.debug("Projects response length:", response.data?.length);
         setProjects(response.data);
       } catch (error) {
         console.error("Failed to fetch projects", error);
@@ -19,7 +26,7 @@ export default function ProjectsPage() {
     };
 
     fetchProjects();
-  }, []);
+  }, [isAuthenticated, user?.id]);
 
   if (isLoading) return <div className="text-center py-10">Loading...</div>;
 

@@ -1,5 +1,10 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
@@ -14,14 +19,54 @@ import ManageAwards from "./pages/dashboard/ManageAwards";
 import EditProfile from "./pages/dashboard/EditProfile";
 import PublicPortfolio from "./pages/PublicPortfolio";
 import "./styles/index.css";
+import { useDispatch, useSelector } from "react-redux";
+import api from "./api/axiosInstance";
+import { setUser, setAuthenticated } from "./redux/slices/authSlice";
 
 function App() {
+  const dispatch = useDispatch();
+  const { user, isAuthenticated } = useSelector((s) => s.auth);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  // Hydrate session on app load (cookie-based session)
+  useEffect(() => {
+    const hydrate = async () => {
+      try {
+        const res = await api.get("/auth/me");
+        if (res?.data) {
+          dispatch(setUser(res.data));
+          dispatch(setAuthenticated(true));
+        } else {
+          dispatch(setAuthenticated(false));
+        }
+      } catch (err) {
+        dispatch(setAuthenticated(false));
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+
+    hydrate();
+  }, [dispatch]);
+
   return (
     <Router>
       <Navbar />
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={
+            // Wait until we've checked session to avoid flicker
+            !authChecked ? (
+              <HomePage />
+            ) : isAuthenticated && user?.handle ? (
+              <Navigate to={`/${user.handle}`} replace />
+            ) : (
+              <HomePage />
+            )
+          }
+        />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/login" element={<LoginPage />} />

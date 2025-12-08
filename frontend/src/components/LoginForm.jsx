@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { setToken, setUser } from "../redux/slices/authSlice";
+import { setUser, setAuthenticated } from "../redux/slices/authSlice";
 import api from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 
@@ -19,8 +19,8 @@ export default function LoginForm() {
 
     try {
       const response = await api.post("/auth/login", { email, password });
-      dispatch(setToken(response.data.token));
       dispatch(setUser(response.data.user));
+      dispatch(setAuthenticated(true));
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.error || "Login failed");

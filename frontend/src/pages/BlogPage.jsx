@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import BlogCard from "../components/BlogCard";
 import api from "../api/axiosInstance";
 
@@ -6,10 +7,16 @@ export default function BlogPage() {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { isAuthenticated, user } = useSelector((s) => s.auth);
+
   useEffect(() => {
     const fetchPosts = async () => {
+      setIsLoading(true);
       try {
-        const response = await api.get("/posts");
+        const endpoint = isAuthenticated ? "/posts/mine" : "/posts";
+        console.debug("Fetching posts from", endpoint, "user:", user?.id);
+        const response = await api.get(endpoint);
+        console.debug("Posts response length:", response.data?.length);
         setPosts(response.data);
       } catch (error) {
         console.error("Failed to fetch posts", error);
@@ -19,7 +26,7 @@ export default function BlogPage() {
     };
 
     fetchPosts();
-  }, []);
+  }, [isAuthenticated, user?.id]);
 
   if (isLoading) return <div className="text-center py-10">Loading...</div>;
 

@@ -24,7 +24,7 @@ export default function ManageProjects() {
 
   const fetchProjects = async () => {
     try {
-      const response = await api.get("/projects");
+      const response = await api.get("/projects/mine");
       dispatch(setProjects(response.data));
     } catch (error) {
       console.error("Failed to fetch projects", error);

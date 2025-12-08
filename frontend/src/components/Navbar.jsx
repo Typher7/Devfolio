@@ -119,7 +119,7 @@ export default function Navbar() {
             >
               Blog
             </Link>
-            {token ? (
+            {isAuthenticated ? (
               <>
                 <Link
                   to="/dashboard"

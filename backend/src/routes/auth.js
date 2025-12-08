@@ -43,7 +43,8 @@ router.post("/login", async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      // In production (HTTPS + cross-site), require SameSite=None and secure
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -94,13 +95,36 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const connection = await pool.getConnection();
 
-    await connection.query(
+    const [result] = await connection.query(
       "INSERT INTO users (email, password, full_name, handle) VALUES (?, ?, ?, ?)",
       [email, hashedPassword, full_name, handle]
     );
+
+    // Fetch the created user
+    const [users] = await connection.query(
+      "SELECT id, email, full_name, handle FROM users WHERE id = ?",
+      [result.insertId]
+    );
+
     connection.release();
 
-    res.status(201).json({ message: "User registered successfully" });
+    const user = users[0];
+
+    // Auto-login: create token and set cookie
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET || "secret",
+      { expiresIn: process.env.JWT_EXPIRY || "7d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(201).json({ token, user });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

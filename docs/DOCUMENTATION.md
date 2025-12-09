@@ -4,6 +4,8 @@
 
 DevFolio is a comprehensive HCI Capstone Project that combines a public-facing portfolio website with a private admin CMS (Content Management System). The system allows portfolio owners to showcase projects, share blog posts, and display awards/achievements.
 
+Latest frontend polish (Dec 2025): unified dark gradient + animated particle background across all homepage sections, glassmorphic cards, refined CTA/Why DevFolio sections, and updated navbar/dashboard visuals.
+
 ## Phases
 
 ### Phase 0: Project Setup & Planning ✅
@@ -49,8 +51,8 @@ src/
 
 ```
 src/
-├── components/    # Navbar, ProjectCard, BlogCard, LoginForm
-├── pages/         # HomePage, ProjectsPage, BlogPage, etc.
+├── components/    # Navbar, ProjectCard, BlogCard, LoginForm, Particles, Prism, TextType
+├── pages/         # HomePage, ProjectsPage, BlogPage, DashboardPage, PublicPortfolio
 ├── redux/         # Store, slices for auth, projects, posts, awards
 ├── api/           # Axios instance with interceptors
 └── styles/        # TailwindCSS configuration
@@ -79,6 +81,9 @@ npm run dev  # Starts on http://localhost:5000
 cd frontend
 npm install
 npm run dev  # Starts on http://localhost:3000
+
+# If you add new UI bits (Particles/Prism/TextType), reinstall to ensure deps are present
+# npm install
 ```
 
 ## Features Implemented
@@ -86,6 +91,7 @@ npm run dev  # Starts on http://localhost:3000
 ### Public Features
 
 ✅ Home page with feature highlights
+✅ Animated particle background and dark gradient applied to entire homepage
 ✅ Projects showcase with filtering
 ✅ Blog listing and reading
 ✅ Awards/Badges display
@@ -100,15 +106,24 @@ npm run dev  # Starts on http://localhost:3000
 ✅ Awards management
 ✅ Profile editing
 ✅ Draft/Publish toggle
+✅ Dashboard welcome typing animation (TextType) and refreshed layout
 
 ### Technical Features
 
 ✅ JWT authentication with bcrypt
 ✅ Redux state management
 ✅ Responsive TailwindCSS UI
+✅ Animated backgrounds (Particles, Prism) with glassmorphic cards
 ✅ RESTful API
 ✅ CORS enabled
 ✅ Error handling
+
+## Frontend UI Notes (Dec 2025)
+
+- **Homepage background**: Particle system now fixed behind all sections. See `HomePage.jsx` for the wrapper div with `position: fixed` and `Particles` props (`particleColors`, `particleCount`, `particleSpread`, `speed`, `particleBaseSize`, `moveParticlesOnHover`, `alphaParticles`, `disableRotation`). Content layers use `relative z-10` to sit above the canvas.
+- **Glass cards**: "Why DevFolio" cards use `bg-slate-800/50`, `border-slate-700`, `backdrop-blur-sm`, and light text to remain legible over the dark gradient.
+- **Animated text**: Dashboard welcome uses `TextType` to cycle welcome phrases.
+- **Background variants**: `Prism.jsx` is available if you want to swap the particle background for a prism animation; update `HomePage.jsx` to import and render `<Prism />` instead of `<Particles />` when desired.
 
 ## Next Steps
 

@@ -6,7 +6,7 @@ A complete full-stack portfolio and content management system built with Node.js
 
 ### Public-Facing Site
 
-- **Home Page** - Beautiful landing page with feature highlights
+- **Home Page** - Beautiful landing page with feature highlights and full-page animated particle background on a dark gradient
 - **Projects Showcase** - Display portfolio projects with descriptions, images, and links
 - **Blog Platform** - Share articles and insights
 - **Awards/Badges** - Highlight achievements and certifications
@@ -20,6 +20,7 @@ A complete full-stack portfolio and content management system built with Node.js
 - **Profile Editor** - Update personal information
 - **Publish Control** - Draft vs Published toggle for all content
 - **Image Upload** - Support for image URLs
+- **Dashboard Welcome** - Animated typing welcome (TextType) and refreshed layout with stats/quick actions
 
 ### Technical Features
 
@@ -28,6 +29,7 @@ A complete full-stack portfolio and content management system built with Node.js
 - **Database** - MySQL with proper schema and relationships
 - **RESTful API** - Well-structured Express API
 - **Responsive UI** - TailwindCSS for modern, mobile-friendly design
+- **Animated UI** - Particles/Prism backgrounds, glassmorphic cards, and TextType typing animation
 
 ## 📁 Project Structure
 
@@ -46,8 +48,8 @@ devfolio/
 │
 ├── frontend/             # React + Vite
 │   ├── src/
-│   │   ├── components/   # Reusable components
-│   │   ├── pages/        # Page components
+│   │   ├── components/   # Reusable components (Navbar, ProjectCard, BlogCard, Particles, Prism, TextType)
+│   │   ├── pages/        # Page components (HomePage, ProjectsPage, BlogPage, DashboardPage, PublicPortfolio)
 │   │   ├── redux/        # Redux store, slices
 │   │   ├── api/          # Axios instance
 │   │   ├── styles/       # TailwindCSS styles
@@ -157,6 +159,8 @@ npm run dev
 
 Frontend runs on `http://localhost:3000`
 
+> Tip: if you add new UI utilities (Particles/Prism/TextType), run `npm install` again in `frontend` to ensure all dependencies are present.
+
 ## 📚 API Endpoints
 
 ### Authentication
@@ -197,7 +201,16 @@ Frontend runs on `http://localhost:3000`
 - `/` - Home page
 - `/projects` - Projects showcase
 - `/blog` - Blog listing
+- `/dashboard` - Admin dashboard with stats and quick actions
+- `/portfolio/:handle` - Public portfolio view
 - `/login` - Login page
+
+## 🖼️ Frontend UI Notes (Dec 2025)
+
+- **Global background**: Home page uses a fixed particle background over a dark gradient; see `HomePage.jsx` for the `Particles` wrapper and `z-10` layering on content.
+- **Glassmorphic cards**: Feature cards now use semi-transparent dark surfaces with backdrop blur for legibility over the animated background.
+- **Typing animation**: Dashboard welcome headline uses `TextType` to cycle phrases.
+- **Alternative background**: `Prism.jsx` is available if you want to swap particles for a prism animation; import and render `<Prism />` instead of `<Particles />`.
 - `/register` - Registration page
 - `/dashboard` - Admin dashboard
 

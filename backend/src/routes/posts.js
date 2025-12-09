@@ -18,6 +18,21 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get current user's posts (protected)
+router.get("/mine", authRequired, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [posts] = await connection.query(
+      "SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC",
+      [req.user.id]
+    );
+    connection.release();
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get single post
 router.get("/:id", async (req, res) => {
   try {
@@ -64,11 +79,17 @@ router.put("/:id", authRequired, async (req, res) => {
     const { title, content, excerpt, image_url, is_published } = req.body;
     const connection = await pool.getConnection();
 
-    await connection.query(
-      "UPDATE posts SET title = ?, content = ?, excerpt = ?, image_url = ?, is_published = ?, updated_at = NOW() WHERE id = ?",
-      [title, content, excerpt, image_url, is_published, id]
+    const [result] = await connection.query(
+      "UPDATE posts SET title = ?, content = ?, excerpt = ?, image_url = ?, is_published = ?, updated_at = NOW() WHERE id = ? AND user_id = ?",
+      [title, content, excerpt, image_url, is_published, id, req.user.id]
     );
     connection.release();
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Post not found or not owned by you" });
+    }
 
     res.json({ message: "Post updated" });
   } catch (error) {
@@ -81,8 +102,17 @@ router.delete("/:id", authRequired, async (req, res) => {
   try {
     const { id } = req.params;
     const connection = await pool.getConnection();
-    await connection.query("DELETE FROM posts WHERE id = ?", [id]);
+    const [result] = await connection.query(
+      "DELETE FROM posts WHERE id = ? AND user_id = ?",
+      [id, req.user.id]
+    );
     connection.release();
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Post not found or not owned by you" });
+    }
 
     res.json({ message: "Post deleted" });
   } catch (error) {

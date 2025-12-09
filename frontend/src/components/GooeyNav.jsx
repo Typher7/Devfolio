@@ -33,7 +33,8 @@ export default function GooeyNav({
 
   useEffect(() => {
     const idx = items.findIndex((it) => location.pathname === it.to);
-    if (idx >= 0) setActiveIndex(idx);
+    // Only set active if we found a match, otherwise set to -1 (no active state)
+    setActiveIndex(idx >= 0 ? idx : -1);
   }, [location.pathname, items]);
 
   const positionBlob = () => {
@@ -41,6 +42,12 @@ export default function GooeyNav({
     const blob = blobRef.current;
     if (!container || !blob) return;
     const index = hoverIndex !== null ? hoverIndex : activeIndex;
+    // Hide blob if no active index
+    if (index < 0) {
+      blob.style.opacity = "0";
+      return;
+    }
+    blob.style.opacity = "1";
     const target = itemRefs.current[index];
     if (!target) return;
     const cRect = container.getBoundingClientRect();
@@ -103,13 +110,16 @@ export default function GooeyNav({
       const tx = Math.cos(angle) * radius;
       const ty = Math.sin(angle) * radius * (Math.random() * 0.6 + 0.7);
 
-      const duration = animationTime + Math.round((Math.random() - 0.5) * timeVariance);
+      const duration =
+        animationTime + Math.round((Math.random() - 0.5) * timeVariance);
       el.style.transition = `transform ${duration}ms ease-out, opacity ${duration}ms ease-out`;
 
       host.appendChild(el);
       // Next frame move outwards
       requestAnimationFrame(() => {
-        el.style.transform = `translate(${tx - 50}px, ${ty - 50}px) scale(${0.9 + Math.random() * 0.3})`;
+        el.style.transform = `translate(${tx - 50}px, ${ty - 50}px) scale(${
+          0.9 + Math.random() * 0.3
+        })`;
         el.style.opacity = "0";
       });
 
@@ -127,7 +137,11 @@ export default function GooeyNav({
 
   return (
     <div className={`relative ${className}`}>
-      <svg className="absolute -z-10" style={{ width: 0, height: 0 }} aria-hidden="true">
+      <svg
+        className="absolute -z-10"
+        style={{ width: 0, height: 0 }}
+        aria-hidden="true"
+      >
         <filter id="gooey">
           <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
           <feColorMatrix
@@ -140,15 +154,28 @@ export default function GooeyNav({
         </filter>
       </svg>
 
-      <div ref={containerRef} className={containerClassName} style={{ position: "relative" }}>
+      <div
+        ref={containerRef}
+        className={containerClassName}
+        style={{ position: "relative" }}
+      >
         {/* Gooey layer: blob + particles (filtered) */}
-        <div className="pointer-events-none absolute inset-0" style={{ filter: "url(#gooey)" }}>
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ filter: "url(#gooey)" }}
+        >
           <div
             ref={blobRef}
             className={blobClassName}
-            style={{ transition: `transform ${animationTime}ms cubic-bezier(0.22, 1, 0.36, 1)` }}
+            style={{
+              transition: `transform ${animationTime}ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms ease`,
+              opacity: 1,
+            }}
           />
-          <div ref={particlesRef} className="pointer-events-none absolute inset-0" />
+          <div
+            ref={particlesRef}
+            className="pointer-events-none absolute inset-0"
+          />
         </div>
 
         {/* Items */}
@@ -159,7 +186,9 @@ export default function GooeyNav({
             to={item.to}
             onMouseEnter={() => setHoverIndex(i)}
             onMouseLeave={() => setHoverIndex(null)}
-            className={`${itemClassName} ${i === activeIndex ? activeItemClassName : ""}`}
+            className={`${itemClassName} ${
+              i === activeIndex ? activeItemClassName : ""
+            }`}
           >
             {item.label}
           </Link>

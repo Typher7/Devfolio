@@ -37,6 +37,21 @@ router.post("/", authRequired, async (req, res) => {
   }
 });
 
+// Get current user's awards (protected)
+router.get("/mine", authRequired, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [awards] = await connection.query(
+      "SELECT * FROM awards WHERE user_id = ? ORDER BY created_at DESC",
+      [req.user.id]
+    );
+    connection.release();
+    res.json(awards);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update award
 router.put("/:id", authRequired, async (req, res) => {
   try {
@@ -44,11 +59,17 @@ router.put("/:id", authRequired, async (req, res) => {
     const { title, description, badge_url, is_published } = req.body;
     const connection = await pool.getConnection();
 
-    await connection.query(
-      "UPDATE awards SET title = ?, description = ?, badge_url = ?, is_published = ?, updated_at = NOW() WHERE id = ?",
-      [title, description, badge_url, is_published, id]
+    const [result] = await connection.query(
+      "UPDATE awards SET title = ?, description = ?, badge_url = ?, is_published = ?, updated_at = NOW() WHERE id = ? AND user_id = ?",
+      [title, description, badge_url, is_published, id, req.user.id]
     );
     connection.release();
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Award not found or not owned by you" });
+    }
 
     res.json({ message: "Award updated" });
   } catch (error) {
@@ -61,8 +82,17 @@ router.delete("/:id", authRequired, async (req, res) => {
   try {
     const { id } = req.params;
     const connection = await pool.getConnection();
-    await connection.query("DELETE FROM awards WHERE id = ?", [id]);
+    const [result] = await connection.query(
+      "DELETE FROM awards WHERE id = ? AND user_id = ?",
+      [id, req.user.id]
+    );
     connection.release();
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Award not found or not owned by you" });
+    }
 
     res.json({ message: "Award deleted" });
   } catch (error) {

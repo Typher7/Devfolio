@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import api from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import {
+  setUser,
+  setAuthenticated,
+  setAuthChecked,
+} from "../redux/slices/authSlice";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +18,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({
@@ -26,8 +33,14 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      await api.post("/auth/register", formData);
-      navigate("/login");
+      const res = await api.post("/auth/register", formData);
+      // Backend auto-logs in and returns token + user
+      if (res?.data?.user) {
+        dispatch(setUser(res.data.user));
+        dispatch(setAuthenticated(true));
+        dispatch(setAuthChecked(true));
+      }
+      navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed");
     } finally {

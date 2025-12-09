@@ -19,6 +19,23 @@ router.get("/", async (req, res) => {
 });
 
 // Get single project
+
+// Get current user's projects (protected)
+router.get("/mine", authRequired, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [projects] = await connection.query(
+      "SELECT * FROM projects WHERE user_id = ? ORDER BY created_at DESC",
+      [req.user.id]
+    );
+    connection.release();
+    res.json(projects);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get single project
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -90,8 +107,8 @@ router.put("/:id", authRequired, async (req, res) => {
     } = req.body;
     const connection = await pool.getConnection();
 
-    await connection.query(
-      "UPDATE projects SET title = ?, description = ?, tags = ?, repo_url = ?, live_url = ?, image_url = ?, is_published = ?, updated_at = NOW() WHERE id = ?",
+    const [result] = await connection.query(
+      "UPDATE projects SET title = ?, description = ?, tags = ?, repo_url = ?, live_url = ?, image_url = ?, is_published = ?, updated_at = NOW() WHERE id = ? AND user_id = ?",
       [
         title,
         description,
@@ -101,9 +118,16 @@ router.put("/:id", authRequired, async (req, res) => {
         image_url,
         is_published,
         id,
+        req.user.id,
       ]
     );
     connection.release();
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Project not found or not owned by you" });
+    }
 
     res.json({ message: "Project updated" });
   } catch (error) {
@@ -116,8 +140,17 @@ router.delete("/:id", authRequired, async (req, res) => {
   try {
     const { id } = req.params;
     const connection = await pool.getConnection();
-    await connection.query("DELETE FROM projects WHERE id = ?", [id]);
+    const [result] = await connection.query(
+      "DELETE FROM projects WHERE id = ? AND user_id = ?",
+      [id, req.user.id]
+    );
     connection.release();
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ error: "Project not found or not owned by you" });
+    }
 
     res.json({ message: "Project deleted" });
   } catch (error) {

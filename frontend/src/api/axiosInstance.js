@@ -1,4 +1,5 @@
 import axios from "axios";
+import store from "../redux/store.js";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -14,6 +15,14 @@ const api = axios.create({
 // Log requests for debugging
 api.interceptors.request.use((config) => {
   console.log(`[Axios] ${config.method.toUpperCase()} ${config.url}`);
+  
+  // Fallback: if no cookie present, try sending token from Redux state
+  const state = store.getState();
+  if (state.auth.token && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${state.auth.token}`;
+    console.log("[Axios] Added token from Redux to Authorization header");
+  }
+  
   return config;
 });
 

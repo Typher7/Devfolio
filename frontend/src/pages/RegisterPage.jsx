@@ -7,6 +7,7 @@ import {
   setUser,
   setAuthenticated,
   setAuthChecked,
+  setToken,
 } from "../redux/slices/authSlice";
 import Particles from "../components/Particles";
 import {
@@ -47,6 +48,7 @@ export default function RegisterPage() {
       // Backend auto-logs in and returns token + user
       if (res?.data?.user) {
         dispatch(setUser(res.data.user));
+        dispatch(setToken(res.data.token)); // Store token for Authorization header fallback
         dispatch(setAuthenticated(true));
         dispatch(setAuthChecked(true));
       }

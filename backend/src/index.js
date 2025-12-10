@@ -12,6 +12,7 @@ import postRoutes from "./routes/posts.js";
 import awardRoutes from "./routes/awards.js";
 import userRoutes from "./routes/users.js";
 import publicRoutes from "./routes/public.js";
+import commentRoutes from "./routes/comments.js";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/awards", awardRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/public", publicRoutes);
+app.use("/api/comments", commentRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {

@@ -79,9 +79,8 @@ export default function DashboardPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">
             <TextType
               text={[
-                `Welcome back, ${user?.full_name}! 👋`,
-                "Ready to update your portfolio?",
-                "Let's make something amazing!",
+                `Welcome back, ${user?.full_name}!`,
+                "Ready to update your portfolio?"
               ]}
               typingSpeed={75}
               pauseDuration={1500}

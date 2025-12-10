@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import api from "../api/axiosInstance";
+import Comments from "../components/Comments";
 
 export default function BlogPostPage() {
   const { id, handle } = useParams();
@@ -71,6 +72,10 @@ export default function BlogPostPage() {
 
         <div className="prose prose-lg max-w-none mb-8">{post.content}</div>
       </article>
+
+      <div className="mt-12 pt-8 border-t border-gray-200">
+        <Comments type="post" itemId={post.id} />
+      </div>
     </div>
   );
 }

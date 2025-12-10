@@ -17,6 +17,7 @@ import {
   FiCode,
 } from "react-icons/fi";
 import Particles from "../components/Particles";
+import GradientText from "../components/GradientText";
 
 export default function HomePage() {
   return (
@@ -54,13 +55,18 @@ export default function HomePage() {
             </span>
           </div>
 
-          <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6">
-            Showcase Your Work,
-            <br />
-            <span className="bg-linear-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-              Inspire the World
-            </span>
-          </h1>
+          <GradientText
+            colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
+            animationSpeed={300}
+            showBorder={false}
+            className="custom-class"
+          >
+            <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6">
+              Showcase Your Work,
+              <br />
+              <span>Inspire the World</span>
+            </h1>
+          </GradientText>
 
           <p className="text-xl md:text-2xl mb-12 opacity-90 max-w-3xl mx-auto text-slate-300">
             Create a stunning portfolio to showcase your projects, share your

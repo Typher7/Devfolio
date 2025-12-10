@@ -4,6 +4,7 @@ import { logout } from "../redux/slices/authSlice";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import api from "../api/axiosInstance";
+import logoImg from "../dev.png";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -45,7 +46,7 @@ export default function Navbar() {
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2">
           <img
-            src="/dev.png"
+            src={logoImg}
             alt="DevFolio logo"
             className="h-10 w-10 rounded-xl object-cover shadow-lg shadow-indigo-500/30"
             loading="lazy"

@@ -80,7 +80,7 @@ export default function DashboardPage() {
             <TextType
               text={[
                 `Welcome back, ${user?.full_name}!`,
-                "Ready to update your portfolio?"
+                "Ready to update your portfolio?",
               ]}
               typingSpeed={75}
               pauseDuration={1500}
@@ -255,7 +255,7 @@ export default function DashboardPage() {
                   Your portfolio URL:
                 </p>
                 <code className="text-sm bg-white/10 px-3 py-1 rounded text-white font-mono">
-                  devfolio.app/portfolio/{user.handle}
+                  devfolio-web.onrender.com/portfolio/{user.handle}
                 </code>
               </div>
             )}

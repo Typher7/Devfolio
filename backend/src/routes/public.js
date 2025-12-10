@@ -9,7 +9,7 @@ router.get("/:handle", async (req, res) => {
   try {
     const { handle } = req.params;
     console.log(`[PUBLIC] Fetching portfolio for handle: ${handle}`);
-    
+
     connection = await pool.getConnection();
 
     // Get user profile
@@ -44,7 +44,9 @@ router.get("/:handle", async (req, res) => {
       [user.id]
     );
 
-    console.log(`[PUBLIC] Portfolio loaded: ${projects.length} projects, ${posts.length} posts, ${awards.length} awards`);
+    console.log(
+      `[PUBLIC] Portfolio loaded: ${projects.length} projects, ${posts.length} posts, ${awards.length} awards`
+    );
 
     res.json({
       profile: user,

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import api from "../api/axiosInstance";
+import Comments from "../components/Comments";
 
 export default function ProjectDetailPage() {
   const { id, handle } = useParams();
@@ -118,6 +119,10 @@ export default function ProjectDetailPage() {
           )}
         </div>
       </article>
+
+      <div className="mt-12 pt-8 border-t border-gray-200">
+        <Comments type="project" itemId={project.id} />
+      </div>
     </div>
   );
 }

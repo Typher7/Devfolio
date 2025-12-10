@@ -90,6 +90,7 @@ router.get("/me", authRequired, async (req, res) => {
 
 // Register
 router.post("/register", async (req, res) => {
+  let connection;
   try {
     const { email, password, full_name, handle } = req.body;
 
@@ -98,7 +99,7 @@ router.post("/register", async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [result] = await connection.query(
       "INSERT INTO users (email, password, full_name, handle) VALUES (?, ?, ?, ?)",
@@ -110,8 +111,6 @@ router.post("/register", async (req, res) => {
       "SELECT id, email, full_name, handle FROM users WHERE id = ?",
       [result.insertId]
     );
-
-    connection.release();
 
     const user = users[0];
 
@@ -131,7 +130,13 @@ router.post("/register", async (req, res) => {
 
     res.status(201).json({ token, user });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (error?.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({ error: "Email or handle already in use" });
+    }
+    console.error("Register error", error);
+    res.status(500).json({ error: "Registration failed" });
+  } finally {
+    if (connection) connection.release();
   }
 });
 

@@ -1,12 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const savedToken =
+  typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
 const initialState = {
   user: null,
-  token: null,
+  token: savedToken,
   isLoading: false,
   error: null,
-  // Do not assume authenticated on load; hydrate session via /auth/me
-  isAuthenticated: false,
+  // Hydrate initial auth from persisted token; /auth/me will confirm
+  isAuthenticated: !!savedToken,
   authChecked: false, // Track if initial auth check is complete
 };
 
@@ -24,12 +27,22 @@ const authSlice = createSlice({
       // Keep token in state only (do not persist to localStorage)
       state.token = action.payload;
       state.isAuthenticated = !!action.payload;
+      if (typeof window !== "undefined") {
+        if (action.payload) {
+          localStorage.setItem("token", action.payload);
+        } else {
+          localStorage.removeItem("token");
+        }
+      }
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
       state.authChecked = false; // Reset so next hydration happens fresh
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+      }
     },
     setAuthChecked: (state, action) => {
       state.authChecked = !!action.payload;

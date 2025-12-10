@@ -28,6 +28,7 @@ import {
   setUser,
   setAuthenticated,
   setAuthChecked,
+  setToken,
 } from "./redux/slices/authSlice";
 
 function App() {
@@ -46,9 +47,11 @@ function App() {
           dispatch(setAuthenticated(true));
         } else {
           dispatch(setAuthenticated(false));
+          dispatch(setToken(null));
         }
       } catch (err) {
         console.debug("[App] Auth hydration error:", err?.message);
+        dispatch(setToken(null));
         dispatch(setAuthenticated(false));
       } finally {
         console.debug("[App] Auth check complete, setting authChecked=true");

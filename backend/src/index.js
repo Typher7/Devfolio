@@ -17,12 +17,37 @@ import commentRoutes from "./routes/comments.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.SERVER_PORT || 5000;
+// Prefer Render/Heroku style PORT, fall back to SERVER_PORT or 5000 for local dev
+const PORT = process.env.PORT || process.env.SERVER_PORT || 5000;
 
 // Middleware
+const allowedOrigins = (
+  process.env.CORS_ORIGIN || "http://localhost:3000,http://localhost:5173"
+)
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: (origin, callback) => {
+      // Allow no origin (same-origin requests)
+      if (!origin) return callback(null, true);
+
+      // Allow explicit whitelist
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      // Allow all .onrender.com in production
+      if (
+        process.env.NODE_ENV === "production" &&
+        origin?.includes(".onrender.com")
+      ) {
+        return callback(null, true);
+      }
+
+      console.warn(`[CORS] Rejected origin: ${origin}`);
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );

@@ -4,6 +4,7 @@ import {
   setUser,
   setAuthenticated,
   setAuthChecked,
+  setToken,
 } from "../redux/slices/authSlice";
 import api from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +30,7 @@ export default function LoginForm() {
     try {
       const response = await api.post("/auth/login", { email, password });
       dispatch(setUser(response.data.user));
+      dispatch(setToken(response.data.token)); // Store token for Authorization header fallback
       dispatch(setAuthenticated(true));
       dispatch(setAuthChecked(true));
       navigate("/dashboard");

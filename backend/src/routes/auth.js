@@ -39,13 +39,27 @@ router.post("/login", async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRY || "7d" }
     );
 
-    // Set HTTP-only cookie
-    res.cookie("token", token, {
+    // Set HTTP-only cookie with explicit domain for cross-origin
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       // In production (HTTPS + cross-site), require SameSite=None and secure
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/", // Ensure cookie is sent for all paths
+    };
+
+    // On production, set domain to allow subdomains if needed
+    if (process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    }
+
+    res.cookie("token", token, cookieOptions);
+    console.log("[AUTH] Login successful, token cookie set", {
+      user: user.id,
+      sameSite: cookieOptions.sameSite,
+      secure: cookieOptions.secure,
+      domain: cookieOptions.domain || "not set",
     });
 
     res.json({
@@ -90,6 +104,7 @@ router.get("/me", authRequired, async (req, res) => {
 
 // Register
 router.post("/register", async (req, res) => {
+  let connection;
   try {
     const { email, password, full_name, handle } = req.body;
 
@@ -98,7 +113,7 @@ router.post("/register", async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
 
     const [result] = await connection.query(
       "INSERT INTO users (email, password, full_name, handle) VALUES (?, ?, ?, ?)",
@@ -111,8 +126,6 @@ router.post("/register", async (req, res) => {
       [result.insertId]
     );
 
-    connection.release();
-
     const user = users[0];
 
     // Auto-login: create token and set cookie
@@ -122,16 +135,34 @@ router.post("/register", async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRY || "7d" }
     );
 
-    res.cookie("token", token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+    };
+
+    if (process.env.NODE_ENV === "production" && process.env.COOKIE_DOMAIN) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    }
+
+    res.cookie("token", token, cookieOptions);
+    console.log("[AUTH] Registration successful, token cookie set", {
+      user: user.id,
+      sameSite: cookieOptions.sameSite,
+      secure: cookieOptions.secure,
     });
 
     res.status(201).json({ token, user });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (error?.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({ error: "Email or handle already in use" });
+    }
+    console.error("Register error", error);
+    res.status(500).json({ error: "Registration failed" });
+  } finally {
+    if (connection) connection.release();
   }
 });
 

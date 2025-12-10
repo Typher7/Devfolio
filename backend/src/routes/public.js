@@ -38,9 +38,9 @@ router.get("/:handle", async (req, res) => {
       [user.id]
     );
 
-    // Get published awards (is_published = 1)
+    // Get published awards (is_published = 1) using existing badge_url column
     const [awards] = await connection.query(
-      "SELECT id, title, description, image_url, created_at FROM awards WHERE user_id = ? AND is_published = 1 ORDER BY created_at DESC",
+      "SELECT id, title, description, badge_url AS image_url, created_at FROM awards WHERE user_id = ? AND is_published = 1 ORDER BY created_at DESC",
       [user.id]
     );
 

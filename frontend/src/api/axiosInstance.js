@@ -15,14 +15,14 @@ const api = axios.create({
 // Log requests for debugging
 api.interceptors.request.use((config) => {
   console.log(`[Axios] ${config.method.toUpperCase()} ${config.url}`);
-  
+
   // Fallback: if no cookie present, try sending token from Redux state
   const state = store.getState();
   if (state.auth.token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${state.auth.token}`;
     console.log("[Axios] Added token from Redux to Authorization header");
   }
-  
+
   return config;
 });
 

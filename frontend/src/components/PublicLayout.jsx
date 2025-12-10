@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import logoImg from "../dev.png";
 
 export default function PublicLayout({ children }) {
   return (
@@ -9,7 +10,7 @@ export default function PublicLayout({ children }) {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             <img
-              src="/dev.png"
+              src={logoImg}
               alt="DevFolio logo"
               className="h-10 w-10 rounded-xl object-cover shadow-md shadow-indigo-500/30"
               loading="lazy"

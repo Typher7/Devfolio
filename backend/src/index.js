@@ -31,9 +31,21 @@ const allowedOrigins = (
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow same-origin or explicit allowlist
-      if (!origin || allowedOrigins.includes(origin))
+      // Allow no origin (same-origin requests)
+      if (!origin) return callback(null, true);
+
+      // Allow explicit whitelist
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      // Allow all .onrender.com in production
+      if (
+        process.env.NODE_ENV === "production" &&
+        origin?.includes(".onrender.com")
+      ) {
         return callback(null, true);
+      }
+
+      console.warn(`[CORS] Rejected origin: ${origin}`);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,

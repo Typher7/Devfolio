@@ -17,7 +17,8 @@ import commentRoutes from "./routes/comments.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.SERVER_PORT || 5000;
+// Prefer Render/Heroku style PORT, fall back to SERVER_PORT or 5000 for local dev
+const PORT = process.env.PORT || process.env.SERVER_PORT || 5000;
 
 // Middleware
 app.use(

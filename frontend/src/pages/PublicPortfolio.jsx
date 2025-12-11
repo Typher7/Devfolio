@@ -119,9 +119,9 @@ export default function PublicPortfolio() {
               >
                 {/* Badge Container */}
                 <div className="relative h-48 bg-linear-to-br from-amber-50 to-orange-50 flex items-center justify-center overflow-hidden">
-                  {award.badge_url ? (
+                  {award.image_url ? (
                     <img
-                      src={award.badge_url}
+                      src={award.image_url}
                       alt={award.title}
                       className="w-32 h-32 object-contain group-hover:scale-110 transition-transform duration-300"
                     />
